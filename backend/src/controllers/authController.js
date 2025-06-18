@@ -53,6 +53,7 @@ const login = async (req,res,next)=>{
             return res.status(401).json({ message : 'E-mail ou senha inválidos!'});
         }
 
+        // Gerando o token
         const token = generateToken({ userId: user.id });
 
         return res.status(200).json({ token });
