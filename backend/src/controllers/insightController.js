@@ -1,44 +1,67 @@
 const { db } = require('../database/connection');
 
+// Cria novo insight
 const createInsight = async (req, res, next) => {
-    try{
-        const { title, content ,tag } = req.body;
-        const userId = req.user;
+  try {
+    const { title, content, tags } = req.body;
+    const userId = req.user;
 
-        if (!title || !content) {
-            return res.status(400).json({ error: 'O título desse conteúdo é obrigatório!'});
-        }
-
-        await new Promise((resolve, reject)=>{
-            db.run(
-                'INSERT INTO insights (title, content, tag, user_id) VALUES (?, ?, ?, ?)',
-                [title, content, tag || null, userId],
-                function (err){
-                    if(err) return reject(err);
-                    resolve();
-                }
-            );
-        });
-
-        return res.status(201).json({ message : 'Insight criado com sucesso!'});
-    }catch (error){
-        next(error);
+    if (!title || !content) {
+      return res.status(400).json({ error: 'O título e conteúdo são obrigatórios!' });
     }
+
+    const tagsArray = Array.isArray(tags)
+      ? tags
+      : String(tags || '')
+          .split(',')
+          .map(tag => tag.trim())
+          .filter(Boolean);
+
+    const tagsString = JSON.stringify(tagsArray);
+
+    await new Promise((resolve, reject) => {
+      db.run(
+        'INSERT INTO insights (title, content, tags, user_id) VALUES (?, ?, ?, ?)',
+        [title, content, tagsString, userId],
+        function (err) {
+          if (err) return reject(err);
+          resolve();
+        }
+      );
+    });
+
+    return res.status(201).json({ message: 'Insight criado com sucesso!' });
+  } catch (error) {
+    next(error);
+  }
 };
 
+// Lista insights do usuário com paginação e filtro por tag
 const listInsights = async (req, res, next) => {
   try {
     const userId = req.user;
+    const { page = 1, limit = 10, tag } = req.query;
+    const offset = (page - 1) * limit;
+
+    let query = 'SELECT id, title, content, tags, created_at, updated_at FROM insights WHERE user_id = ?';
+    const params = [userId];
+
+    if (tag) {
+      query += ' AND tags LIKE ?';
+      params.push(`%"${tag}"%`);
+    }
+
+    query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
+    params.push(Number(limit), Number(offset));
 
     const insights = await new Promise((resolve, reject) => {
-      db.all(
-        'SELECT id, title, content, tag, created_at FROM insights WHERE user_id = ? ORDER BY created_at DESC',
-        [userId],
-        (err, rows) => {
-          if (err) return reject(err);
-          resolve(rows);
-        }
-      );
+      db.all(query, params, (err, rows) => {
+        if (err) return reject(err);
+        rows.forEach(row => {
+          row.tags = JSON.parse(row.tags || '[]');
+        });
+        resolve(rows);
+      });
     });
 
     return res.status(200).json({ insights });
@@ -47,4 +70,99 @@ const listInsights = async (req, res, next) => {
   }
 };
 
-module.exports = { createInsight, listInsights };
+// Retorna um insight específico do usuário logado
+const getInsightById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user;
+
+    const insight = await new Promise((resolve, reject) => {
+      db.get(
+        'SELECT id, title, content, tags, created_at, updated_at FROM insights WHERE id = ? AND user_id = ?',
+        [id, userId],
+        (err, row) => {
+          if (err) return reject(err);
+          resolve(row);
+        }
+      );
+    });
+
+    if (!insight) {
+      return res.status(404).json({ error: 'Insight não encontrado!' });
+    }
+
+    insight.tags = JSON.parse(insight.tags || '[]');
+
+    return res.status(200).json({ insight });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Atualiza um insight
+const updateInsight = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { title, content, tags } = req.body;
+    const userId = req.user;
+
+    if (!title || !content) {
+      return res.status(400).json({ error: 'Título e conteúdo são obrigatórios!' });
+    }
+
+    const tagsArray = Array.isArray(tags)
+      ? tags
+      : String(tags || '')
+          .split(',')
+          .map(tag => tag.trim())
+          .filter(Boolean);
+
+    const tagsString = JSON.stringify(tagsArray);
+
+    await new Promise((resolve, reject) => {
+      db.run(
+        'UPDATE insights SET title = ?, content = ?, tags = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?',
+        [title, content, tagsString, id, userId],
+        function (err) {
+          if (err) return reject(err);
+          resolve();
+        }
+      );
+    });
+
+    return res.status(200).json({ message: 'Insight atualizado com sucesso!' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Deleta um insight
+const deleteInsight = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user;
+
+    await new Promise((resolve, reject) => {
+      db.run(
+        'DELETE FROM insights WHERE id = ? AND user_id = ?',
+        [id, userId],
+        function (err) {
+          if (err) return reject(err);
+          resolve();
+        }
+      );
+    });
+
+    return res.status(200).json({ message: 'Insight deletado com sucesso!' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  createInsight,
+  listInsights,
+  getInsightById,
+  updateInsight,
+  deleteInsight
+};
