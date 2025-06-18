@@ -12,7 +12,6 @@ const {
 // Protege todas as rotas abaixo
 router.use(authMiddleware);
 
-// Rotas do CRUD de insight
 router.post('/', createInsight);
 router.get('/', listInsights); 
 router.put('/:id', updateInsight);
