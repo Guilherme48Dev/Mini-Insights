@@ -20,7 +20,7 @@ const initializeDatabase = () => {
           console.error('❌ Erro ao aplicar schema.sql:', err.message);
           return reject(err);
         } else {
-          console.log('✅ Schema aplicado com sucesso!');
+          console.log('✅ Schema aplicado com sucesso!'); 
           console.log('📂 Caminho do banco carregado:', dbPath);
           resolve();
         }
