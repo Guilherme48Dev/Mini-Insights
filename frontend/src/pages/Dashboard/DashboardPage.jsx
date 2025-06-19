@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import {
-  Box,
-  Typography,
-  Grid,
-  Paper,
-  CircularProgress,
-  Button,
-  TextField, 
+    Box,
+    Typography,
+    Grid,
+    Paper,
+    CircularProgress,
+    Button,
+    TextField,
 } from '@mui/material';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
@@ -19,6 +19,27 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const [selectedTag, setSelectedTag] = useState(null);
     const [searchTag, setSearchTag] = useState('');
+    const [editingInsight, setEditingInsight] = useState(null);
+
+    const handleEdit = (insight) => {
+        setEditingInsight(insight);
+        setOpenModal(true);
+    };
+
+    const handleDelete = async (id) => {
+        const confirm = window.confirm('Tem certeza que deseja excluir este insight?');
+        if (!confirm) return;
+
+        try {
+            await axios.delete(`http://localhost:3333/insights/${id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            await fetchInsights();
+        } catch (err) {
+            alert('Erro ao excluir insight');
+            console.error(err);
+        }
+    };
 
 
     const fetchInsights = async () => {
@@ -135,6 +156,15 @@ export default function DashboardPage() {
                                                 </Box>
                                             ))}
                                     </Box>
+                                    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
+                                        <Button size="small" onClick={() => handleEdit(insight)} color="primary">
+                                            Editar
+                                        </Button>
+                                        <Button size="small" onClick={() => handleDelete(insight.id)} color="error">
+                                            Excluir
+                                        </Button>
+                                    </Box>
+
                                 </Paper>
                             </Grid>
                         ))}
@@ -143,9 +173,14 @@ export default function DashboardPage() {
 
             <CreateInsightModal
                 open={openModal}
-                onClose={() => setOpenModal(false)}
+                onClose={() => {
+                    setOpenModal(false);
+                    setEditingInsight(null);
+                }}
                 onCreated={fetchInsights}
+                insight={editingInsight}
             />
+
         </Box>
     );
 }
