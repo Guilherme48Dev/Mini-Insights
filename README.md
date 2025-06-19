@@ -42,28 +42,6 @@ Funcionalidades principais:
 
 ---
 
-## 📁 Estrutura de Pastas
-
-Mini-Insights/
-│
-├── backend/ # API RESTful com Express
-│ ├── config/ # Configurações globais
-│ ├── controllers/ # Lógica dos endpoints
-│ ├── database/ # Inicialização e conexão com SQLite
-│ ├── middleware/ # Middlewares como autenticação
-│ ├── routes/ # Arquivos de rotas da API
-│ ├── services/ # Camadas auxiliares
-│ └── utils/ # Funções utilitárias
-│
-├── frontend/ # Aplicação React
-│ ├── components/ # Componentes reutilizáveis
-│ ├── context/ # Contexto global (ex: Auth)
-│ ├── pages/ # Páginas principais
-│ ├── router/ # Arquivos de rotas
-│ └── services/ # Configuração do axios e chamadas HTTP
-
----
-
 ## ▶️ Como Executar o Projeto
 
 ### 1. Clone o repositório
