@@ -11,6 +11,9 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 import CreateInsightModal from '../../components/CreateInsightModal';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+
 
 export default function DashboardPage() {
   const { token } = useAuth();
@@ -21,6 +24,12 @@ export default function DashboardPage() {
   const [selectedTag, setSelectedTag] = useState(null);
   const [searchTag, setSearchTag] = useState('');
   const [editingInsight, setEditingInsight] = useState(null);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success', // 'error' | 'info' | 'warning'
+  });
+
 
   const handleEdit = (insight) => {
     setEditingInsight(insight);
@@ -36,9 +45,19 @@ export default function DashboardPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       await fetchInsights();
+
+      setSnackbar({
+        open: true,
+        message: 'Insight excluído com sucesso!',
+        severity: 'success',
+      });
     } catch (err) {
-      alert('Erro ao excluir insight');
       console.error(err);
+      setSnackbar({
+        open: true,
+        message: 'Erro ao excluir insight',
+        severity: 'error',
+      });
     }
   };
 
@@ -54,12 +73,17 @@ export default function DashboardPage() {
       });
       setInsights(response.data.insights);
     } catch (err) {
-      alert('Erro ao buscar insights');
       console.error(err);
+      setSnackbar({
+        open: true,
+        message: 'Erro ao buscar insights',
+        severity: 'error',
+      });
     } finally {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     setLoading(true);
@@ -280,7 +304,23 @@ export default function DashboardPage() {
         }}
         onCreated={fetchInsights}
         insight={editingInsight}
+        setSnackbar={setSnackbar} 
       />
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
