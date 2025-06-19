@@ -1,9 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LoginPage from '../pages/Login';
 import RegisterPage from '../pages/Register';
-import CreateInsightPage from '../pages/Insights/CreateInsightPage';
-
-
 import DashboardPage from '../pages/Dashboard/DashboardPage';
 
 export default function AppRoutes() {
@@ -13,7 +10,6 @@ export default function AppRoutes() {
         <Route path="/" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/novo" element={<CreateInsightPage />} />
       </Routes>
     </BrowserRouter>
   );
