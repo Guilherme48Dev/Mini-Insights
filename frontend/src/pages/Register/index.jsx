@@ -6,28 +6,25 @@ import {
   Paper,
 } from '@mui/material';
 import { useForm } from 'react-hook-form';
-import { login } from '../../services/authService';
-import { useAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
-  const { loginUser } = useAuth();
   const navigate = useNavigate();
 
   async function onSubmit(data) {
     try {
-      const response = await login(data.email, data.password);
-      loginUser(response.user);
-      navigate('/dashboard');
-    } catch (err) {
-      alert('Login inválido!');
+      await axios.post('http://localhost:3333/auth/register', data);
+      alert('Conta criada com sucesso!');
+      navigate('/');
+    } catch (error) {
+      alert('Erro ao registrar: ' + error.response?.data?.message || 'Erro inesperado');
     }
   }
 
@@ -44,10 +41,19 @@ export default function LoginPage() {
     >
       <Paper elevation={3} sx={{ p: 4, width: '100%', maxWidth: 400 }}>
         <Typography variant="h5" gutterBottom align="center">
-          Mini Insights
+          Criar Conta
         </Typography>
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
+          <TextField
+            label="Nome"
+            fullWidth
+            margin="normal"
+            {...register('name', { required: 'Digite seu nome' })}
+            error={!!errors.name}
+            helperText={errors.name?.message}
+          />
+
           <TextField
             label="Email"
             fullWidth
@@ -73,12 +79,12 @@ export default function LoginPage() {
             variant="contained"
             sx={{ mt: 3, borderRadius: '30px', py: 1.2, fontWeight: 'bold' }}
           >
-            Entrar
+            Registrar
           </Button>
-          <Typography variant="body2" sx={{ mt: 2, textAlign: 'center' }}>
-            Não tem conta? <Link to="/register">Crie uma</Link>
-          </Typography>
 
+          <Typography variant="body2" sx={{ mt: 2, textAlign: 'center' }}>
+            Já tem conta? <Link to="/">Entrar</Link>
+          </Typography>
         </form>
       </Paper>
     </Box>
