@@ -9,19 +9,13 @@ const {
   getInsightById
 } = require('../controllers/insightController');
 
-// Protege todas as rotas abaixo
+// Protege todas as rotas
 router.use(authMiddleware);
 
+router.get('/', listInsights);
 router.post('/', createInsight);
-router.get('/', listInsights); 
+router.get('/:id', getInsightById);
 router.put('/:id', updateInsight);
 router.delete('/:id', deleteInsight);
-router.get('/:id', getInsightById);
-
-
-// // users
-// router.get('/', (req, res) => {
-//   res.json({ message: `Usuário autenticado com ID ${req.user}` });
-// });
 
 module.exports = router;
