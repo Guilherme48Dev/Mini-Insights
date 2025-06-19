@@ -24,7 +24,7 @@ export default function LoginPage() {
   async function onSubmit(data) {
     try {
       const response = await login(data.email, data.password);
-      loginUser(response.user);
+      loginUser(response.user, response.token);
       navigate('/dashboard');
     } catch (err) {
       alert('Login inválido!');
