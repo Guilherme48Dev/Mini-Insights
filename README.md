@@ -62,6 +62,8 @@ Mini-Insights/
 │ ├── router/ # Arquivos de rotas
 │ └── services/ # Configuração do axios e chamadas HTTP
 
+---
+
 ## ▶️ Como Executar o Projeto
 
 ### 1. Clone o repositório
@@ -88,6 +90,16 @@ npm install
 npm run dev
 ```
 O frontend estará rodando em: http://localhost:5173
+
+---
+
+## 🔐 Conta já registrada (para testes)
+Para facilitar o teste rápido da aplicação, já deixei uma conta pré-criada no banco de dados:
+
+**👤 Email:**    admin@gmail.com  
+**🔑 Senha:**    159357admin  
+
+---
 
 ## 📬 Contato
 Desenvolvido por **Guilherme Souza** 💻
