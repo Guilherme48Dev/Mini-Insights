@@ -74,158 +74,202 @@ export default function DashboardPage() {
         minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
+        alignItems: 'center',
       }}
     >
-      <Typography variant="h4" gutterBottom>
-        Meus Insights
-      </Typography>
-
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
-        <Button
-          variant="contained"
-          sx={{
-            borderRadius: '30px',
-            px: 3,
-            py: 1,
-            textTransform: 'none',
-            fontWeight: 'bold',
-          }}
-          onClick={() => setOpenModal(true)}
-        >
-          + Novo Insight
-        </Button>
-      </Box>
-
-      <TextField
-        label="Filtrar por tag"
-        variant="outlined"
-        size="small"
-        value={searchTag}
-        onChange={(e) => setSearchTag(e.target.value)}
-        sx={{ mb: 3 }}
-      />
-
-      <Box sx={{ flexGrow: 1 }}>
-        {loading ? (
-          <CircularProgress />
-        ) : (
-          <Grid container spacing={3}>
-            {insights
-              .filter((insight) => {
-                if (!searchTag) return true;
-
-                const tags = Array.isArray(insight.tags)
-                  ? insight.tags
-                  : typeof insight.tags === 'string'
-                  ? insight.tags.split(',').map((t) => t.trim())
-                  : [];
-
-                return tags.some((tag) =>
-                  tag.toLowerCase().includes(searchTag.toLowerCase())
-                );
-              })
-              .map((insight) => (
-                <Grid item key={insight.id} xs={12} sm={6} md={4}>
-                  <Paper elevation={3} sx={{ p: 2 }}>
-                    <Typography variant="h6">{insight.title}</Typography>
-                    <Typography variant="body2" sx={{ mt: 1 }}>
-                      {insight.content}
-                    </Typography>
-                    <Box sx={{ mt: 2 }}>
-                      {(Array.isArray(insight.tags)
-                        ? insight.tags
-                        : insight.tags?.split(',') || []
-                      ).map((tag, i) => (
-                        <Box
-                          key={i}
-                          component="span"
-                          sx={{
-                            mr: 1,
-                            px: 1.5,
-                            py: 0.5,
-                            bgcolor: '#e0e0e0',
-                            borderRadius: '12px',
-                            fontSize: '0.75rem',
-                          }}
-                        >
-                          #{tag.trim()}
-                        </Box>
-                      ))}
-                    </Box>
-                    <Box
-                      sx={{
-                        mt: 2,
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                      }}
-                    >
-                      <Button
-                        size="small"
-                        onClick={() => handleEdit(insight)}
-                        color="primary"
-                      >
-                        Editar
-                      </Button>
-                      <Button
-                        size="small"
-                        onClick={() => handleDelete(insight.id)}
-                        color="error"
-                      >
-                        Excluir
-                      </Button>
-                    </Box>
-                  </Paper>
-                </Grid>
-              ))}
-          </Grid>
-        )}
-      </Box>
-
-      {/* Paginação no rodapé */}
-      <Box
-        sx={{
-          mt: 5,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: 2,
-        }}
-      >
-        <Button
-          variant="contained"
-          size="small"
-          onClick={() => setCurrentPage((prev) => prev - 1)}
-          disabled={currentPage === 1}
-          sx={{
-            textTransform: 'none',
-            borderRadius: '30px',
-            fontWeight: 600,
-            px: 3,
-          }}
-        >
-          ← Anterior
-        </Button>
-
-        <Typography
-          variant="body2"
-          sx={{ mx: 2, fontWeight: 500 }}
-        >
-          Página {currentPage}
+      <Box sx={{ width: '100%', maxWidth: 1000 }}>
+        <Typography variant="h4" gutterBottom>
+          Meus Insights
         </Typography>
 
-        <Button
-          variant="contained"
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
+          <Button
+            variant="contained"
+            sx={{
+              borderRadius: '30px',
+              px: 3,
+              py: 1,
+              textTransform: 'none',
+              fontWeight: 'bold',
+            }}
+            onClick={() => setOpenModal(true)}
+          >
+            + Novo Insight
+          </Button>
+        </Box>
+
+        <TextField
+          label="Filtrar por tag"
+          variant="outlined"
           size="small"
-          onClick={() => setCurrentPage((prev) => prev + 1)}
+          value={searchTag}
+          onChange={(e) => setSearchTag(e.target.value)}
+          sx={{ mb: 3 }}
+        />
+
+        <Box sx={{ flexGrow: 1 }}>
+          {loading ? (
+            <CircularProgress />
+          ) : (
+            <Grid container spacing={3}>
+              {insights
+                .filter((insight) => {
+                  if (!searchTag) return true;
+
+                  const tags = Array.isArray(insight.tags)
+                    ? insight.tags
+                    : typeof insight.tags === 'string'
+                      ? insight.tags.split(',').map((t) => t.trim())
+                      : [];
+
+                  return tags.some((tag) =>
+                    tag.toLowerCase().includes(searchTag.toLowerCase())
+                  );
+                })
+                .map((insight) => {
+                  const parsedTags = Array.isArray(insight.tags)
+                    ? insight.tags
+                    : insight.tags?.split(',').map((t) => t.trim()) || [];
+
+                  return (
+                    <Grid item key={insight.id} xs={12} sm={6} md={4} sx={{ display: 'flex', justifyContent: 'center' }}>
+                      <Paper
+                        elevation={4}
+                        sx={{
+                          minWidth: 300,
+                          maxWidth: 300,
+                          minHeight: 300,
+                          maxHeight: 300,
+                          p: 2,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between',
+                          boxSizing: 'border-box',
+                          borderRadius: 2,
+                          transition: 'transform 0.2s',
+                          '&:hover': {
+                            transform: 'scale(1.02)',
+                          },
+                        }}
+                      >
+
+                        <Box sx={{ mb: 1 }}>
+                          <Typography
+                            variant="h6"
+                            sx={{
+                              wordBreak: 'break-word',
+                              mb: 1,
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                            }}
+                          >
+                            {insight.title.length > 60
+                              ? insight.title.slice(0, 57) + '...'
+                              : insight.title}
+                          </Typography>
+
+                          <Box
+                            sx={{
+                              height: 64,
+                              overflowY: 'auto',
+                              pr: 1,
+                            }}
+                          >
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                whiteSpace: 'pre-wrap',
+                                wordBreak: 'break-word',
+                                fontSize: '0.875rem',
+                              }}
+                            >
+                              {insight.content}
+                            </Typography>
+                          </Box>
+                        </Box>
+
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
+                          {parsedTags.slice(0, 8).map((tag, i) => (
+                            <Box
+                              key={i}
+                              component="span"
+                              sx={{
+                                px: 1.5,
+                                py: 0.5,
+                                bgcolor: '#e0e0e0',
+                                borderRadius: 10,
+                                fontSize: '0.75rem',
+                              }}
+                            >
+                              #{tag}
+                            </Box>
+                          ))}
+                        </Box>
+
+
+                        <Box sx={{ mt: 1, display: 'flex', justifyContent: 'space-between' }}>
+                          <Button size="small" onClick={() => handleEdit(insight)} color="primary">
+                            Editar
+                          </Button>
+                          <Button size="small" onClick={() => handleDelete(insight.id)} color="error">
+                            Excluir
+                          </Button>
+                        </Box>
+                      </Paper>
+                    </Grid>
+
+                  );
+                })}
+            </Grid>
+          )}
+        </Box>
+
+        <Box
           sx={{
-            textTransform: 'none',
-            borderRadius: '30px',
-            fontWeight: 600,
-            px: 3,
+            mt: 5,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 2,
           }}
         >
-          Próxima →
-        </Button>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => setCurrentPage((prev) => prev - 1)}
+            disabled={currentPage === 1}
+            sx={{
+              textTransform: 'none',
+              borderRadius: '30px',
+              fontWeight: 600,
+              px: 3,
+            }}
+          >
+            ← Anterior
+          </Button>
+
+          <Typography
+            variant="body2"
+            sx={{ mx: 2, fontWeight: 500 }}
+          >
+            Página {currentPage}
+          </Typography>
+
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+            sx={{
+              textTransform: 'none',
+              borderRadius: '30px',
+              fontWeight: 600,
+              px: 3,
+            }}
+          >
+            Próxima →
+          </Button>
+        </Box>
       </Box>
 
       <CreateInsightModal

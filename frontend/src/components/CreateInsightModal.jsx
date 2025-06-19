@@ -17,8 +17,14 @@ export default function CreateInsightModal({ open, onClose, onCreated, insight }
         handleSubmit,
         reset,
         setValue,
+        watch,
         formState: { errors },
     } = useForm();
+
+    const title = watch('title') || '';
+    const content = watch('content') || '';
+
+
 
     // Preenche os campos se for edição
     useEffect(() => {
@@ -82,27 +88,54 @@ export default function CreateInsightModal({ open, onClose, onCreated, insight }
                     <TextField
                         fullWidth
                         label="Título"
-                        {...register('title', { required: 'Campo obrigatório' })}
+                        {...register('title', {
+                            required: 'Campo obrigatório',
+                            maxLength: { value: 80, message: 'Máximo de 80 caracteres' },
+                        })}
+                        inputProps={{ maxLength: 80 }}
                         error={!!errors.title}
-                        helperText={errors.title?.message}
+                        helperText={errors.title?.message || `${title.length}/80 caracteres`}
                         sx={{ mb: 2 }}
                     />
+
                     <TextField
                         fullWidth
                         label="Conteúdo"
                         multiline
                         rows={4}
-                        {...register('content', { required: 'Campo obrigatório' })}
+                        {...register('content', {
+                            required: 'Campo obrigatório',
+                            maxLength: { value: 160, message: 'Máximo de 160 caracteres' },
+                        })}
+                        inputProps={{ maxLength: 160 }}
                         error={!!errors.content}
-                        helperText={errors.content?.message}
+                        helperText={errors.content?.message || `${content.length}/160 caracteres`}
                         sx={{ mb: 2 }}
                     />
+
                     <TextField
                         fullWidth
                         label="Tags (separadas por vírgula)"
-                        {...register('tags')}
+                        {...register('tags', {
+                            validate: (value) => {
+                                const tags = value
+                                    .split(',')
+                                    .map((t) => t.trim())
+                                    .filter(Boolean);
+
+                                if (tags.length > 8) return 'Máximo de 8 tags permitidas';
+                                if (tags.some((t) => t.length > 12)) return 'Cada tag pode ter no máximo 12 caracteres';
+                                return true;
+                            },
+                        })}
+                        inputProps={{ maxLength: 120 }} // limite aproximado de digitação
+                        error={!!errors.tags}
+                        helperText={errors.tags?.message}
                         sx={{ mb: 2 }}
                     />
+
+
+
                     <Button
                         type="submit"
                         variant="contained"
