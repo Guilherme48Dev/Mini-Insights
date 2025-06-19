@@ -8,6 +8,10 @@ import {
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+import { useState } from 'react';
+
 
 export default function RegisterPage() {
 
@@ -18,16 +22,30 @@ export default function RegisterPage() {
     formState: { errors },
   } = useForm();
 
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
+
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success',
+  });
+
+  const showSnackbar = (message, severity = 'success') =>
+  setSnackbar({ open: true, message, severity });
+
+
 
   // Envia os dados do formulário para o backend 
   async function onSubmit(data) {
     try {
-      await axios.post('http://localhost:3333/auth/register', data); 
-      alert('Conta criada com sucesso!');
-      navigate('/'); 
+      await axios.post('http://localhost:3333/auth/register', data);
+      showSnackbar('Conta criada com sucesso!');
+      navigate('/');
     } catch (error) {
-      alert('Erro ao registrar: ' + error.response?.data?.message || 'Erro inesperado');
+      showSnackbar(
+        error.response?.data?.message || 'Erro inesperado',
+        'error'
+      );
     }
   }
 
@@ -94,6 +112,21 @@ export default function RegisterPage() {
 
         </form>
       </Paper>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+
     </Box>
   );
 }

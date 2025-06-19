@@ -6,6 +6,10 @@ import {
   Button,
   CircularProgress,
 } from '@mui/material';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+import { useState } from 'react';
+import ConfirmDeleteDialog from '../components/ConfirmDeleteDialog';
 
 
 export default function InsightGrid({
@@ -15,6 +19,26 @@ export default function InsightGrid({
   handleEdit,
   handleDelete,
 }) {
+
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'info',
+  });
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [insightToDelete, setInsightToDelete] = useState(null);
+  const handleConfirmDelete = () => {
+    if (!insightToDelete) return;
+    handleDelete(insightToDelete.id); // chama a função pai
+    setDeleteDialogOpen(false);       // fecha o modal
+    setInsightToDelete(null);         // limpa o selecionado
+  };
+
+
+
+  const showSnackbar = (message, severity = 'info') =>
+    setSnackbar({ open: true, message, severity });
+
   // Filtra os insights com base na tag digitada (searchTag)
   const filteredInsights = insights.filter((insight) => {
     if (!searchTag) return true;
@@ -127,7 +151,15 @@ export default function InsightGrid({
                     <Button size="small" onClick={() => handleEdit(insight)} color="primary">
                       Editar
                     </Button>
-                    <Button size="small" onClick={() => handleDelete(insight.id)} color="error">
+                    <Button
+                      size="small"
+                      color="error"
+                      onClick={() => {
+                        setInsightToDelete(insight); // ou só insight.id se preferir
+                        setDeleteDialogOpen(true);
+                      }}
+
+                    >
                       Excluir
                     </Button>
                   </Box>
@@ -136,8 +168,31 @@ export default function InsightGrid({
               </Grid>
             );
           })}
+          <ConfirmDeleteDialog
+            open={deleteDialogOpen}
+            onClose={() => setDeleteDialogOpen(false)}
+            onConfirm={handleConfirmDelete}
+
+            title={insightToDelete?.title}
+          />
+
         </Grid>
       )}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+
     </Box>
   );
 }

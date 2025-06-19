@@ -11,25 +11,26 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 
 export default function CreateInsightModal({
-  open,        
-  onClose,    
-  onCreated,    
-  insight,      
-  setSnackbar,  
+  open,
+  onClose,
+  onCreated,
+  insight,
+  setSnackbar,
 }) {
 
   const { token } = useAuth(); // recupera o token do usuário autenticado
-  const title = watch('title') || '';
-  const content = watch('content') || '';
-
   const {
     register,
     handleSubmit,
     reset,
     setValue,
     watch,
-    formState: { errors }, // erros de validação
+    formState: { errors },
   } = useForm();
+
+  const title = watch('title') || '';
+  const content = watch('content') || '';
+
 
   // Preenche os campos ao abrir o modal com dados do insight (se houver) ou reseta
   useEffect(() => {

@@ -19,6 +19,7 @@ export default function DashboardPage() {
   const [openModal, setOpenModal] = useState(false);
   const [editingInsight, setEditingInsight] = useState(null);
   const [loading, setLoading] = useState(true);
+
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
@@ -36,21 +37,20 @@ export default function DashboardPage() {
   };
 
   // Ação de excluir: confirma com o usuário, deleta e recarrega a lista
-  const handleDelete = async (id) => {
-    const confirmDelete = window.confirm('Tem certeza que deseja excluir este insight?');
-    if (!confirmDelete) return;
+ const handleDelete = async (id) => {
+  try {
+    await axios.delete(`http://localhost:3333/insights/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    await fetchInsights();
+    showSnackbar('Insight excluído com sucesso!');
+  } catch (err) {
+    console.error(err);
+    showSnackbar('Erro ao excluir insight', 'error');
+  }
+};
 
-    try {
-      await axios.delete(`http://localhost:3333/insights/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      await fetchInsights(); // atualiza a listagem após excluir
-      showSnackbar('Insight excluído com sucesso!');
-    } catch (err) {
-      console.error(err);
-      showSnackbar('Erro ao excluir insight', 'error');
-    }
-  };
+
 
   // Busca os insights 
   const fetchInsights = async () => {
@@ -92,7 +92,7 @@ export default function DashboardPage() {
       }}
     >
       <Box sx={{ width: '100%', maxWidth: 1000 }}>
-        
+
         <SectionTitle>Meus Insights</SectionTitle>
 
         <PrimaryActionButton onClick={() => setOpenModal(true)}>

@@ -10,6 +10,10 @@ import { login } from '../../services/authService';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+import { useState } from 'react';
+
 
 export default function LoginPage() {
 
@@ -20,17 +24,28 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm();
 
-  const { loginUser } = useAuth();         
-  const navigate = useNavigate();         
+  const { loginUser } = useAuth();
+  const navigate = useNavigate();
+
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success',
+  });
+
+  const showSnackbar = (message, severity = 'success') =>
+    setSnackbar({ open: true, message, severity });
+
 
   // Função chamada para o formulário de login
   async function onSubmit(data) {
     try {
       const response = await login(data.email, data.password); // envia dados para a API
       loginUser(response.user, response.token);                // armazena usuário e token
-      navigate('/dashboard');                                  
+      showSnackbar('Login realizado com sucesso!');
+      setTimeout(() => navigate('/dashboard'), 1000);
     } catch (err) {
-      alert('Login inválido!'); // mostra alerta em caso de erro
+      showSnackbar('Email ou senha inválidos', 'error');
     }
   }
 
@@ -52,7 +67,7 @@ export default function LoginPage() {
 
         {/* Formulário de login */}
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          
+
           <TextField
             label="Email"
             fullWidth
@@ -87,6 +102,21 @@ export default function LoginPage() {
 
         </form>
       </Paper>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+
     </Box>
   );
 }
