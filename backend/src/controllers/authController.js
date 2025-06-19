@@ -36,7 +36,7 @@ const register = async (req, res, next) => {
 
         return res.status(201).json({ message: 'Usuário registrado com sucesso!' });
     } catch (error) {
-        next(error); 
+        next(error);
     }
 };
 
@@ -66,7 +66,11 @@ const login = async (req, res, next) => {
         // Gera o token JWT com o ID do usuário
         const token = generateToken({ userId: user.id });
 
-        return res.status(200).json({ token });
+        // Remove a senha antes de enviar os dados pro frontend
+        const { password: _, ...userWithoutPassword } = user;
+
+        return res.status(200).json({ token, user: userWithoutPassword });
+
     } catch (error) {
         next(error);
     }
