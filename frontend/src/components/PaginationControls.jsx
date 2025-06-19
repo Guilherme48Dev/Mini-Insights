@@ -1,5 +1,6 @@
 import { Box, Button, Typography } from '@mui/material';
 
+// Componente de paginação simples: mostra página atual e botões para navegar
 export default function PaginationControls({ currentPage, setCurrentPage }) {
   return (
     <Box

@@ -12,7 +12,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
 export default function DashboardPage() {
-  const { token } = useAuth();
+  const { token } = useAuth(); // recupera o token do usuário logado
   const [insights, setInsights] = useState([]);
   const [searchTag, setSearchTag] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -25,14 +25,17 @@ export default function DashboardPage() {
     severity: 'success',
   });
 
+  // Exibe uma mensagem no snackbar
   const showSnackbar = (message, severity = 'success') =>
     setSnackbar({ open: true, message, severity });
 
+  // Ação de editar: abre o modal com os dados do insight selecionado
   const handleEdit = (insight) => {
     setEditingInsight(insight);
     setOpenModal(true);
   };
 
+  // Ação de excluir: confirma com o usuário, deleta e recarrega a lista
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm('Tem certeza que deseja excluir este insight?');
     if (!confirmDelete) return;
@@ -41,7 +44,7 @@ export default function DashboardPage() {
       await axios.delete(`http://localhost:3333/insights/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      await fetchInsights();
+      await fetchInsights(); // atualiza a listagem após excluir
       showSnackbar('Insight excluído com sucesso!');
     } catch (err) {
       console.error(err);
@@ -49,6 +52,7 @@ export default function DashboardPage() {
     }
   };
 
+  // Busca os insights 
   const fetchInsights = async () => {
     try {
       const response = await axios.get('http://localhost:3333/insights', {
@@ -64,11 +68,13 @@ export default function DashboardPage() {
     }
   };
 
+  // Recarrega os insights sempre que o token ou a página mudar
   useEffect(() => {
     setLoading(true);
     fetchInsights();
   }, [token, currentPage]);
 
+  // Fecha o modal e limpa o insight em edição
   const handleCloseModal = () => {
     setOpenModal(false);
     setEditingInsight(null);
@@ -86,6 +92,7 @@ export default function DashboardPage() {
       }}
     >
       <Box sx={{ width: '100%', maxWidth: 1000 }}>
+        
         <SectionTitle>Meus Insights</SectionTitle>
 
         <PrimaryActionButton onClick={() => setOpenModal(true)}>

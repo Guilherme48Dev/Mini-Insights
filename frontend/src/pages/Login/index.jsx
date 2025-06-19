@@ -12,22 +12,25 @@ import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
 export default function LoginPage() {
+
+  // Hook do formulário (react-hook-form)
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
-  const { loginUser } = useAuth();
-  const navigate = useNavigate();
+  const { loginUser } = useAuth();         
+  const navigate = useNavigate();         
 
+  // Função chamada para o formulário de login
   async function onSubmit(data) {
     try {
-      const response = await login(data.email, data.password);
-      loginUser(response.user, response.token);
-      navigate('/dashboard');
+      const response = await login(data.email, data.password); // envia dados para a API
+      loginUser(response.user, response.token);                // armazena usuário e token
+      navigate('/dashboard');                                  
     } catch (err) {
-      alert('Login inválido!');
+      alert('Login inválido!'); // mostra alerta em caso de erro
     }
   }
 
@@ -47,7 +50,9 @@ export default function LoginPage() {
           Mini Insights
         </Typography>
 
+        {/* Formulário de login */}
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
+          
           <TextField
             label="Email"
             fullWidth
@@ -75,6 +80,7 @@ export default function LoginPage() {
           >
             Entrar
           </Button>
+
           <Typography variant="body2" sx={{ mt: 2, textAlign: 'center' }}>
             Não tem conta? <Link to="/register">Crie uma</Link>
           </Typography>

@@ -11,25 +11,27 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 
 export default function CreateInsightModal({
-  open,
-  onClose,
-  onCreated,
-  insight,
-  setSnackbar, // ✨ novo
+  open,        
+  onClose,    
+  onCreated,    
+  insight,      
+  setSnackbar,  
 }) {
-  const { token } = useAuth();
+
+  const { token } = useAuth(); // recupera o token do usuário autenticado
+  const title = watch('title') || '';
+  const content = watch('content') || '';
+
   const {
     register,
     handleSubmit,
     reset,
     setValue,
     watch,
-    formState: { errors },
+    formState: { errors }, // erros de validação
   } = useForm();
 
-  const title = watch('title') || '';
-  const content = watch('content') || '';
-
+  // Preenche os campos ao abrir o modal com dados do insight (se houver) ou reseta
   useEffect(() => {
     if (insight) {
       setValue('title', insight.title);
@@ -45,6 +47,7 @@ export default function CreateInsightModal({
     }
   }, [insight, setValue, reset]);
 
+  // Função executada ao submeter o formulário
   async function onSubmit(data) {
     const payload = {
       title: data.title,
@@ -54,6 +57,7 @@ export default function CreateInsightModal({
 
     try {
       if (insight) {
+        // Atualiza um insight existente
         await axios.put(`http://localhost:3333/insights/${insight.id}`, payload, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -63,6 +67,7 @@ export default function CreateInsightModal({
           severity: 'success',
         });
       } else {
+        // Cria um novo insight
         await axios.post('http://localhost:3333/insights', payload, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -73,8 +78,8 @@ export default function CreateInsightModal({
         });
       }
 
-      onCreated();
-      onClose();
+      onCreated(); // atualiza a lista de insights no componente pai
+      onClose();   // fecha o modal
     } catch (err) {
       console.error(err);
       setSnackbar({
@@ -111,7 +116,7 @@ export default function CreateInsightModal({
               required: 'Campo obrigatório',
               maxLength: { value: 80, message: 'Máximo de 80 caracteres' },
             })}
-            inputProps={{ maxLength: 80 }}
+            inputProps={{ maxLength: 80 }} // também limita o input manualmente
             error={!!errors.title}
             helperText={errors.title?.message || `${title.length}/80 caracteres`}
             sx={{ mb: 2 }}
@@ -136,6 +141,7 @@ export default function CreateInsightModal({
             fullWidth
             label="Tags (separadas por vírgula)"
             {...register('tags', {
+              // Valida até 8 tags com no máximo 12 caracteres cada
               validate: (value) => {
                 const tags = value
                   .split(',')
@@ -147,7 +153,7 @@ export default function CreateInsightModal({
                 return true;
               },
             })}
-            inputProps={{ maxLength: 120 }} // limite de digitação total
+            inputProps={{ maxLength: 120 }} // limite de caracteres total no input
             error={!!errors.tags}
             helperText={errors.tags?.message}
             sx={{ mb: 2 }}

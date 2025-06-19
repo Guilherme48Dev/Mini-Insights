@@ -10,19 +10,22 @@ import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 
 export default function RegisterPage() {
+
+  // Hook do react-hook-form para controlar o formulário
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
 
+  // Envia os dados do formulário para o backend 
   async function onSubmit(data) {
     try {
-      await axios.post('http://localhost:3333/auth/register', data);
+      await axios.post('http://localhost:3333/auth/register', data); 
       alert('Conta criada com sucesso!');
-      navigate('/');
+      navigate('/'); 
     } catch (error) {
       alert('Erro ao registrar: ' + error.response?.data?.message || 'Erro inesperado');
     }
@@ -39,12 +42,15 @@ export default function RegisterPage() {
         p: 2,
       }}
     >
+      {/* Card do formulário de registro */}
       <Paper elevation={3} sx={{ p: 4, width: '100%', maxWidth: 400 }}>
+
         <Typography variant="h5" gutterBottom align="center">
           Criar Conta
         </Typography>
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
+
           <TextField
             label="Nome"
             fullWidth
@@ -85,6 +91,7 @@ export default function RegisterPage() {
           <Typography variant="body2" sx={{ mt: 2, textAlign: 'center' }}>
             Já tem conta? <Link to="/">Entrar</Link>
           </Typography>
+
         </form>
       </Paper>
     </Box>

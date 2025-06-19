@@ -7,6 +7,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 
+
 export default function InsightGrid({
   insights,
   loading,
@@ -14,15 +15,18 @@ export default function InsightGrid({
   handleEdit,
   handleDelete,
 }) {
+  // Filtra os insights com base na tag digitada (searchTag)
   const filteredInsights = insights.filter((insight) => {
     if (!searchTag) return true;
 
+    // Converte as tags em array se necessário
     const tags = Array.isArray(insight.tags)
       ? insight.tags
       : typeof insight.tags === 'string'
         ? insight.tags.split(',').map((t) => t.trim())
         : [];
 
+    // Verifica se alguma tag contém o texto buscado
     return tags.some((tag) =>
       tag.toLowerCase().includes(searchTag.toLowerCase())
     );
@@ -33,8 +37,11 @@ export default function InsightGrid({
       {loading ? (
         <CircularProgress />
       ) : (
+
         <Grid container spacing={3}>
           {filteredInsights.map((insight) => {
+
+            // Garante que as tags estejam em formato de array
             const parsedTags = Array.isArray(insight.tags)
               ? insight.tags
               : insight.tags?.split(',').map((t) => t.trim()) || [];
@@ -64,7 +71,9 @@ export default function InsightGrid({
                     '&:hover': { transform: 'scale(1.02)' },
                   }}
                 >
+
                   <Box sx={{ mb: 1 }}>
+
                     <Typography
                       variant="h6"
                       sx={{
@@ -75,6 +84,7 @@ export default function InsightGrid({
                         textOverflow: 'ellipsis',
                       }}
                     >
+                      {/* Limita visualmente o título a 60 caracteres */}
                       {insight.title.length > 60
                         ? insight.title.slice(0, 57) + '...'
                         : insight.title}
@@ -94,6 +104,7 @@ export default function InsightGrid({
                     </Box>
                   </Box>
 
+                  {/* Exibe as tags do insight */}
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
                     {parsedTags.slice(0, 8).map((tag, i) => (
                       <Box
@@ -120,6 +131,7 @@ export default function InsightGrid({
                       Excluir
                     </Button>
                   </Box>
+
                 </Paper>
               </Grid>
             );
